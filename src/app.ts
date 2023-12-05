@@ -54,11 +54,11 @@ const startServer = async () => {
       try {
         const { id } = req.body;
         const connection = await pool.connect();
-        const query = /* sql */ `
+        const deleteMember = /* sql */ `
         DELETE FROM public.members
         WHERE id = $1
         `;
-        const result = await connection.query(query, [id]);
+        await connection.query(deleteMember, [id]);
         connection.release();
         res.status(200).send('Member deleted!');
       } catch (err) {
@@ -66,16 +66,16 @@ const startServer = async () => {
         res.status(500).send('Failed to delete member');
       }
     })
-    .patch('/members/requests/approve', async (req, res) => {
+    .patch('/members/approve', async (req, res) => {
       try {
         const { id } = req.body;
         const connection = await pool.connect();
-        const query = /* sql */ `
+        const approveMember = /* sql */ `
         UPDATE public.members
         SET approval = $1
         WHERE id = $2
         `;
-        const result = await connection.query(query, ['APPROVED', id]);
+        await connection.query(approveMember, ['APPROVED', id]);
         connection.release();
         res.status(200).send('Member approved!');
       } catch (err) {
