@@ -26,6 +26,8 @@ const startServer = async () => {
         connection.release();
         if (result.rows.length > 0) {
           res.status(200).json(result.rows);
+        } else {
+          res.status(200).json([]);
         }
       } catch (err) {
         console.log(err);
@@ -44,6 +46,8 @@ const startServer = async () => {
         connection.release();
         if (result.rows.length > 0) {
           res.status(200).json(result.rows);
+        } else {
+          res.status(200).json([]);
         }
       } catch (err) {
         console.log(err);
