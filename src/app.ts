@@ -7,8 +7,13 @@ const pool = new Pool({
   connectionString: `postgres://sewebapp_user:luEjNrUHQL8NdP4E6ZWnbCGBEMziWzWi@dpg-cln8uohr6k8c73ad86bg-a.singapore-postgres.render.com/sewebapp?ssl=true`
 });
 
+const secondPool = new Pool({
+  connectionString:'postgres://login_f99n_user:q0zi2Nhcsildfe3ZaMRrlQ71LZc407f2@dpg-cm05lped3nmc738k08d0-a.singapore-postgres.render.com/login_f99n?ssl=true'
+});
+
 const startServer = async () => {
   const app = express();
+  
 
   app
     .use(cors())
@@ -87,9 +92,59 @@ const startServer = async () => {
         res.status(500).send('Failed to appprove request');
       }
     })
+    .post('/register', async (req, res) => {
+      try {
+      const { firstname, lastname, username, email, password } = req.body;
+      const connection = await secondPool.connect();
+      const insertUser = /* sql */ `
+      INSERT INTO public.login (firstname, lastname, username, email, password)
+      VALUES ($1, $2, $3, $4, $5)
+      `;
+
+      if (password.length < 6) {
+        res.status(400).send('Password must be at least 6 characters long');
+        return;
+      }
+      
+      await connection.query(insertUser, [firstname, lastname, username, email, password]);
+      connection.release();
+      res.status(200).send('User registered!');
+      } catch (err) {
+      console.log(err);
+      res.status(500).send('Failed to register user');
+      }
+     })
+    .post('/login', async (req, res) => {
+      try {
+        const { email, password } = req.body;
+        const connection = await secondPool.connect();
+        const checkUser = /* sql */ `
+        SELECT * FROM public.login
+        WHERE email = $1
+        `;
+        const result = await connection.query(checkUser, [email]);
+        connection.release();
+        if (result.rows.length > 0) {
+          if (result.rows[0].password === password) {
+            res.status(200).send('User logged in!');
+          } else {
+            res.status(401).send('Invalid credentials');
+          }
+        } else {
+          res.status(404).send('No user found');
+        }
+      } catch (err) {
+        console.log(err);
+        res.status(500).send('Failed to log in user');
+      }
+    })
+    
     .listen(5000, () => {
       console.log('Server started at https://localhost:5000');
     });
 };
 
 startServer();
+
+
+
