@@ -1,16 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import { Pool } from 'pg';
 import multer from 'multer';
-
-const pool = new Pool({
-  user: 'jedmamosto',
-  host: 'singapore-postgres.render.com',
-  database: 'jed_sewebapp_personal',
-  password: 'goDs9uechBjlbzatPwooBoTSq8mWfDP4',
-  port: 5432,
-  ssl: true,
-});
+import db from '../db/dbConnection';
 
 const app = express();
 
@@ -29,7 +20,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-pool.connect()
+db.connect()
   .then(() => {
     console.log('Connected to PostgreSQL');
   })
@@ -38,22 +29,47 @@ pool.connect()
     process.exit(1);
   });
 
-app.post('/announcement/post', upload.none(), async (req, res) => {
+app.post('/admin/create-announcements', upload.single('image_file'), async (req, res) => {
   console.log('Route is being hit!');
-  const { title, caption, image_file, date_of_post } = req.body;
-  console.log('Received data:', req.body);
+  const { title, caption, date_of_post } = req.body;
 
   try {
-    const result = await pool.query(
+    if (!req.file) {
+      console.log('no image file')
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const image_file = req.file.buffer;
+
+    console.log('Received data:', req.body);
+
+    const result = await db.query(
       'INSERT INTO announcements (title, caption, image_file, date_of_post) VALUES ($1, $2, $3, $4)',
       [title, caption, image_file, date_of_post]
     );
 
     res.status(201).json({ message: 'Announcement created successfully', result });
+    console.log('Announcement created succesfully')
   } catch (error) {
     console.error('Error inserting data into PostgreSQL:', error);
     res.status(500).json({ message: 'Internal Server Error' });
   }
+});
+
+
+app.get('/announcements/:id', async (req, res) => {
+  const { id } = req.params;
+  const query = 'SELECT title, caption, image_file FROM announcements WHERE id = $1';
+  const result = await db.query(query, [id]);
+
+  const announcement = result.rows[0];
+  const imageBuffer = announcement.image_file;
+
+  res.writeHead(200, {
+    'Content-Type': 'image/*',
+    'Content-Length': imageBuffer.length,
+  });
+  res.end(imageBuffer);
 });
 
 const PORT = 3001;
