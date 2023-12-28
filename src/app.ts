@@ -4,10 +4,9 @@ import { Pool } from 'pg';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
+// import bcrypt from 'bcrypt';
 
-const env = dotenv.config();
-
+dotenv.config();
 const pool = new Pool({
   connectionString: `${process.env.DB_CONNECTION}`
 });
@@ -45,7 +44,7 @@ const startServer = async () => {
         const query = /* sql */ `
         SELECT m.id, m.name, m.email, m.year, m.approval FROM public.members as m
         WHERE m.approval = 'PENDING'
-        ORDER BY m.id ASC
+        ORDER BY m.id ASC 
         `;
         const result = await connection.query(query);
         connection.release();
@@ -94,25 +93,13 @@ const startServer = async () => {
     })
     .post('/register', async (req, res) => {
       try {
-        const { firstname, lastname, username, email, password } = req.body;
+        const { email, password } = req.body;
         const connection = await pool.connect();
         const insertUser = /* sql */ `
-      INSERT INTO public.login (firstname, lastname, username, email, password)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO public.UserLogins (email, password)
+      VALUES ($1, $2)
       `;
-
-        if (password.length < 6) {
-          res.status(400).send('Password must be at least 6 characters long');
-          return;
-        }
-
-        await connection.query(insertUser, [
-          firstname,
-          lastname,
-          username,
-          email,
-          password
-        ]);
+        await connection.query(insertUser, [email, password]);
         connection.release();
         res.status(200).send('User registered!');
       } catch (err) {
@@ -154,16 +141,17 @@ const startServer = async () => {
 
       if (!token) {
         res.status(400).json({ message: 'Not Logged In' });
-      }
+      } else {
+        try {
+          const claims = jwt.verify(token, 'secret');
+          const { userId } = claims as any;
+          userId;
+          // get from database
 
-      try {
-        const claims = jwt.verify(token, 'secret');
-        const { userId } = claims as any;
-        // get from database
-
-        res.status(200).json({ me: 'User', status: true });
-      } catch (err) {
-        res.status(400).json({ status: false });
+          res.status(200).json({ me: 'User', status: true });
+        } catch (err) {
+          res.status(400).json({ status: false });
+        }
       }
     })
 
