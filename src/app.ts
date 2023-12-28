@@ -2,18 +2,18 @@ import express from 'express';
 import cors from 'cors';
 import { Pool } from 'pg';
 import bodyParser from 'body-parser';
+import * as dotenv from 'dotenv';
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+
+const env = dotenv.config();
 
 const pool = new Pool({
-  connectionString: `postgres://sewebapp_user:luEjNrUHQL8NdP4E6ZWnbCGBEMziWzWi@dpg-cln8uohr6k8c73ad86bg-a.singapore-postgres.render.com/sewebapp?ssl=true`
-});
-
-const secondPool = new Pool({
-  connectionString:'postgres://login_f99n_user:q0zi2Nhcsildfe3ZaMRrlQ71LZc407f2@dpg-cm05lped3nmc738k08d0-a.singapore-postgres.render.com/login_f99n?ssl=true'
+  connectionString: `${process.env.DB_CONNECTION}`
 });
 
 const startServer = async () => {
   const app = express();
-  
 
   app
     .use(cors())
@@ -94,30 +94,36 @@ const startServer = async () => {
     })
     .post('/register', async (req, res) => {
       try {
-      const { firstname, lastname, username, email, password } = req.body;
-      const connection = await secondPool.connect();
-      const insertUser = /* sql */ `
+        const { firstname, lastname, username, email, password } = req.body;
+        const connection = await pool.connect();
+        const insertUser = /* sql */ `
       INSERT INTO public.login (firstname, lastname, username, email, password)
       VALUES ($1, $2, $3, $4, $5)
       `;
 
-      if (password.length < 6) {
-        res.status(400).send('Password must be at least 6 characters long');
-        return;
-      }
-      
-      await connection.query(insertUser, [firstname, lastname, username, email, password]);
-      connection.release();
-      res.status(200).send('User registered!');
+        if (password.length < 6) {
+          res.status(400).send('Password must be at least 6 characters long');
+          return;
+        }
+
+        await connection.query(insertUser, [
+          firstname,
+          lastname,
+          username,
+          email,
+          password
+        ]);
+        connection.release();
+        res.status(200).send('User registered!');
       } catch (err) {
-      console.log(err);
-      res.status(500).send('Failed to register user');
+        console.log(err);
+        res.status(500).send('Failed to register user');
       }
-     })
+    })
     .post('/login', async (req, res) => {
       try {
         const { email, password } = req.body;
-        const connection = await secondPool.connect();
+        const connection = await pool.connect();
         const checkUser = /* sql */ `
         SELECT * FROM public.login
         WHERE email = $1
@@ -126,9 +132,13 @@ const startServer = async () => {
         connection.release();
         if (result.rows.length > 0) {
           if (result.rows[0].password === password) {
-            res.status(200).send('User logged in!');
+            // no bcrypt yet
+            const token = jwt.sign({ user: 'Test' }, 'secret', {
+              expiresIn: '1h'
+            });
+            res.json({ token });
           } else {
-            res.status(401).send('Invalid credentials');
+            res.status(401).json({ message: 'Invalid email or password' });
           }
         } else {
           res.status(404).send('No user found');
@@ -138,13 +148,28 @@ const startServer = async () => {
         res.status(500).send('Failed to log in user');
       }
     })
-    
+    .get('/me', async (req, res) => {
+      const authHeader = req.header('Authorization');
+      const token = authHeader?.split(' ')[1];
+
+      if (!token) {
+        res.status(400).json({ message: 'Not Logged In' });
+      }
+
+      try {
+        const claims = jwt.verify(token, 'secret');
+        const { userId } = claims as any;
+        // get from database
+
+        res.status(200).json({ me: 'User', status: true });
+      } catch (err) {
+        res.status(400).json({ status: false });
+      }
+    })
+
     .listen(5000, () => {
       console.log('Server started at https://localhost:5000');
     });
 };
 
 startServer();
-
-
-
