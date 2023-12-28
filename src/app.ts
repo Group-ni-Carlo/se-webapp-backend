@@ -4,7 +4,7 @@ import { Pool } from 'pg';
 import bodyParser from 'body-parser';
 import * as dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-// import bcrypt from 'bcrypt';
+import bcrypt from 'bcrypt';
 
 dotenv.config();
 const pool = new Pool({
@@ -94,12 +94,13 @@ const startServer = async () => {
     .post('/register', async (req, res) => {
       try {
         const { email, password } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
         const connection = await pool.connect();
         const insertUser = /* sql */ `
       INSERT INTO public.UserLogins (email, password)
       VALUES ($1, $2)
       `;
-        await connection.query(insertUser, [email, password]);
+        await connection.query(insertUser, [email, hashedPassword]);
         connection.release();
         res.status(200).send('User registered!');
       } catch (err) {
@@ -112,18 +113,21 @@ const startServer = async () => {
         const { email, password } = req.body;
         const connection = await pool.connect();
         const checkUser = /* sql */ `
-        SELECT * FROM public.login
+        SELECT * FROM public.UserLogins
         WHERE email = $1
         `;
-        const result = await connection.query(checkUser, [email]);
+        const { rows } = await connection.query(checkUser, [email]);
         connection.release();
-        if (result.rows.length > 0) {
-          if (result.rows[0].password === password) {
-            // no bcrypt yet
+        if (rows.length > 0) {
+          const correctPassword = await bcrypt.compare(
+            password,
+            rows[0].password
+          );
+          if (correctPassword) {
             const token = jwt.sign({ user: 'Test' }, 'secret', {
               expiresIn: '1h'
             });
-            res.json({ token });
+            res.json({ token, message: 'Login successful' });
           } else {
             res.status(401).json({ message: 'Invalid email or password' });
           }
