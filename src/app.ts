@@ -93,19 +93,34 @@ const startServer = async () => {
     })
     .post('/register', async (req, res) => {
       try {
-        const { email, password } = req.body;
+        const { email, password, firstName, lastName } = req.body;
         const hashedPassword = await bcrypt.hash(password, 10);
         const connection = await pool.connect();
         const insertUser = /* sql */ `
-      INSERT INTO public.UserLogins (email, password)
-      VALUES ($1, $2)
-      `;
-        await connection.query(insertUser, [email, hashedPassword]);
+        INSERT INTO public.Users (id, first_name, last_name)
+        VALUES (DEFAULT, $1, $2) 
+        RETURNING id
+        `;
+        const insertUserLogins = /* sql */ `
+        INSERT INTO public.UserLogins (email, password, user_id)
+        VALUES ($1, $2, $3)
+        `;
+        const { rows } = await connection.query(insertUser, [
+          firstName,
+          lastName
+        ]);
+        if (rows.length > 0) {
+          await connection.query(insertUserLogins, [
+            email,
+            hashedPassword,
+            rows[0].id
+          ]);
+        }
         connection.release();
-        res.status(200).send('User registered!');
+        res.status(200).json({ message: 'User registered!' });
       } catch (err) {
         console.log(err);
-        res.status(500).send('Failed to register user');
+        res.status(500).json({ message: 'Failed registration' });
       }
     })
     .post('/login', async (req, res) => {
@@ -113,7 +128,7 @@ const startServer = async () => {
         const { email, password } = req.body;
         const connection = await pool.connect();
         const checkUser = /* sql */ `
-        SELECT * FROM public.UserLogins
+        SELECT id, email, password, user_id FROM public.UserLogins
         WHERE email = $1
         `;
         const { rows } = await connection.query(checkUser, [email]);
@@ -124,9 +139,13 @@ const startServer = async () => {
             rows[0].password
           );
           if (correctPassword) {
-            const token = jwt.sign({ user: 'Test' }, 'secret', {
-              expiresIn: '1h'
-            });
+            const token = jwt.sign(
+              { user: rows[0].user_id },
+              `${process.env.CODE}`,
+              {
+                expiresIn: '1h'
+              }
+            );
             res.json({ token, message: 'Login successful' });
           } else {
             res.status(401).json({ message: 'Invalid email or password' });
@@ -144,17 +163,39 @@ const startServer = async () => {
       const token = authHeader?.split(' ')[1];
 
       if (!token) {
-        res.status(400).json({ message: 'Not Logged In' });
+        res.status(401).json({ status: false });
       } else {
         try {
-          const claims = jwt.verify(token, 'secret');
-          const { userId } = claims as any;
-          userId;
-          // get from database
-
-          res.status(200).json({ me: 'User', status: true });
+          const connection = await pool.connect();
+          const claims = jwt.verify(token, `${process.env.CODE}`);
+          const { user } = claims as any;
+          const checkUser = /* sql */ `
+          SELECT u.id, u.first_name, u.last_name, u.year_level, u.approval 
+          FROM public.users as u
+          WHERE u.id = $1
+          `;
+          const { rows } = await connection.query(checkUser, [user]);
+          connection.release();
+          let userInfo: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            yearLevel: string;
+          };
+          if (rows.length > 0) {
+            userInfo = {
+              firstName: rows[0].first_name,
+              lastName: rows[0].last_name,
+              email: rows[0].email,
+              yearLevel: rows[0].year
+            };
+            res.status(200).json({ me: userInfo, status: true });
+          } else {
+            res.status(401).json({ status: false });
+          }
         } catch (err) {
-          res.status(400).json({ status: false });
+          console.log(err);
+          res.status(400).json({ err });
         }
       }
     })
