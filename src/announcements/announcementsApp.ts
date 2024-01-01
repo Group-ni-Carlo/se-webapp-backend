@@ -4,6 +4,8 @@ import db from '../../db/dbConnection';
 import multer from 'multer';
 import { getAnnouncements } from './getAnnouncements';
 import { postAnnouncements } from './postAnnouncements';
+import { putAnnouncements } from './putAnnouncements';
+import { deleteAnnouncements } from './deleteAnnouncements';
 import path from 'path';
 
 export const announcementsApp = () => {
@@ -37,6 +39,10 @@ export const announcementsApp = () => {
   getAnnouncements(app, db);
 
   postAnnouncements(app, db, upload);
+
+  putAnnouncements(app, db, upload);
+
+  deleteAnnouncements(app, db);
 
   app.listen(3001, () => { console.log('Server started at https://localhost:3001') })
 }

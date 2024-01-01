@@ -4,7 +4,6 @@ import { Multer } from 'multer';
 
 export const postAnnouncements = (app: Express, db: Pool, upload: Multer) => {
 
-
   app.post('/admin/create/announcements', upload.single('image_file'), async (req, res) => {
     const { title, caption } = req.body;
     const imageFile = req.file as Express.Multer.File | undefined;
@@ -18,7 +17,7 @@ export const postAnnouncements = (app: Express, db: Pool, upload: Multer) => {
       const imageFilePath = imageFile.path;
 
       const result = await db.query(
-        'INSERT INTO announcements (title, caption, image_file, date) VALUES ($1, $2, $3, NOW())',
+        'INSERT INTO announcements (title, caption, image_file, date_created, date_last_edit) VALUES ($1, $2, $3, NOW(), NOW())',
         [title, caption, imageFilePath]
       )
 
@@ -31,7 +30,7 @@ export const postAnnouncements = (app: Express, db: Pool, upload: Multer) => {
         }
       })
 
-      console.log('Route hit!')
+      console.log('Route create hit!')
       res.status(201).json({ success: true, data: result.rows[0] });
     } catch (error) {
       console.log(`Error inserting data into the database: ${error}`);
