@@ -98,7 +98,7 @@ router
         const claims = jwt.verify(token, `${process.env.CODE}`);
         const { user } = claims as any;
         const checkUser = /* sql */ `
-          SELECT u.id, u.first_name, u.last_name, u.year_level, u.approval 
+          SELECT u.id, u.first_name, u.last_name, u.type, u.year_level, u.approval 
           FROM public.users as u
           WHERE u.id = $1
           `;
@@ -107,6 +107,7 @@ router
         let userInfo: {
           firstName: string;
           lastName: string;
+          type: string;
           email: string;
           yearLevel: string;
         };
@@ -114,6 +115,7 @@ router
           userInfo = {
             firstName: rows[0].first_name,
             lastName: rows[0].last_name,
+            type: rows[0].type,
             email: rows[0].email,
             yearLevel: rows[0].year
           };
