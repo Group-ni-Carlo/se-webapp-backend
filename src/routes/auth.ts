@@ -85,49 +85,6 @@ router
       console.log(err);
       res.status(404).json({ message: error });
     }
-  })
-  .get('/me', async (req: Request, res: Response) => {
-    const authHeader = req.header('Authorization');
-    const token = authHeader?.split(' ')[1];
-
-    if (!token) {
-      res.status(401).json({ status: false });
-    } else {
-      try {
-        const connection = await pool.connect();
-        const claims = jwt.verify(token, `${process.env.CODE}`);
-        const { user } = claims as any;
-        const checkUser = /* sql */ `
-          SELECT u.id, u.first_name, u.last_name, u.type, u.year_level, u.approval 
-          FROM public.users as u
-          WHERE u.id = $1
-          `;
-        const { rows } = await connection.query(checkUser, [user]);
-        connection.release();
-        let userInfo: {
-          firstName: string;
-          lastName: string;
-          type: string;
-          email: string;
-          yearLevel: string;
-        };
-        if (rows.length > 0) {
-          userInfo = {
-            firstName: rows[0].first_name,
-            lastName: rows[0].last_name,
-            type: rows[0].type,
-            email: rows[0].email,
-            yearLevel: rows[0].year
-          };
-          res.status(200).json({ userInfo, status: true });
-        } else {
-          res.status(401).json({ status: false });
-        }
-      } catch (err) {
-        console.log(err);
-        res.status(400).json({ err });
-      }
-    }
   });
 
 export default router;

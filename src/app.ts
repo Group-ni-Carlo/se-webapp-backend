@@ -6,6 +6,7 @@ import members from './routes/members';
 import auth from './routes/auth';
 import announcements from './routes/announcements';
 import editAnnouncements from './routes/admin/editAnnouncements';
+import authenticateUser from './middlewares/authenticateUser';
 
 const startServer = async () => {
   const app = express();
