@@ -119,7 +119,7 @@ router
             email: rows[0].email,
             yearLevel: rows[0].year
           };
-          res.status(200).json({ me: userInfo, status: true });
+          res.status(200).json({ userInfo, status: true });
         } else {
           res.status(401).json({ status: false });
         }
