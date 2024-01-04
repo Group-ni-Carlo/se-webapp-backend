@@ -1,0 +1,13 @@
+-- migrate:up
+CREATE TABLE Users(
+	id SERIAL PRIMARY KEY NOT NULL,
+	first_name VARCHAR(255) NOT NULL,
+	last_name VARCHAR(255) NOT NULL,
+	type VARCHAR(255) NOT NULL DEFAULT('member'),
+	year_level VARCHAR(255) NOT NULL DEFAULT('None'),
+	motto VARCHAR(255) NOT NULL DEFAULT('None'),
+	approval VARCHAR(255) NOT NULL DEFAULT('PENDING')
+)
+
+-- migrate:down
+DROP TABLE Users
