@@ -7,6 +7,7 @@ export const postPartners = (app: Express, db: Pool, upload: Multer) => {
     '/admin/create/partners',
     upload.single('logo_file'),
     async (req, res) => {
+      const { title } = req.body;
       const logoFile = req.file as Express.Multer.File | undefined;
 
       try {
@@ -20,18 +21,25 @@ export const postPartners = (app: Express, db: Pool, upload: Multer) => {
         const logoFilePath = logoFile.path;
 
         const result = await db.query(
-          'INSERT INTO partners (logo_file, date_created, date_last_edit) VALUES ($1, NOW(), NOW())',
-          [logoFilePath]
+          'INSERT INTO partners (title, logo_file, date_created, date_last_edit) VALUES ($1, $2 NOW(), NOW())',
+          [title, logoFilePath]
         );
 
-        app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-          if (err) {
-            console.error(err.stack)
-            res.status(500).send({ error: err.message })
-          } else {
-            next()
+        app.use(
+          (
+            err: Error,
+            req: Request,
+            res: Response,
+            next: NextFunction
+          ): void => {
+            if (err) {
+              console.error(err.stack);
+              res.status(500).send({ error: err.message });
+            } else {
+              next();
+            }
           }
-        })
+        );
 
         console.log('Route create hit!');
         res.status(201).json({ success: true, data: result.rows[0] });

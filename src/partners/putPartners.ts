@@ -8,6 +8,7 @@ export const putPartners = (app: Express, db: Pool, upload: Multer) => {
     upload.single('logo_file'),
     async (req, res) => {
       const { id } = req.params;
+      const { title } = req.body;
       const logoFile = req.file as Express.Multer.File | undefined;
 
       try {
@@ -25,25 +26,32 @@ export const putPartners = (app: Express, db: Pool, upload: Multer) => {
 
         if (!logoFile) {
           result = await db.query(
-            'UPDATE partners SET date_last_edit = NOW() WHERE id = $1',
-            [numericId]
+            'UPDATE partners SET title = $1 date_last_edit = NOW() WHERE id = $2',
+            [title, numericId]
           );
         } else {
           logoFilePath = logoFile.path;
           result = await db.query(
-            'UPDATE partners SET logo_file = $1, date_last_edit = NOW() WHERE id = $2',
-            [logoFilePath, numericId]
+            'UPDATE partners SET title = $1 logo_file = $2, date_last_edit = NOW() WHERE id = $3',
+            [title, logoFilePath, numericId]
           );
         }
-        
-        app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-          if (err) {
-            console.error(err.stack)
-            res.status(500).send({ error: err.message })
-          } else {
-            next()
+
+        app.use(
+          (
+            err: Error,
+            req: Request,
+            res: Response,
+            next: NextFunction
+          ): void => {
+            if (err) {
+              console.error(err.stack);
+              res.status(500).send({ error: err.message });
+            } else {
+              next();
+            }
           }
-        })
+        );
 
         console.log('Route edit hit!');
         res
@@ -51,6 +59,9 @@ export const putPartners = (app: Express, db: Pool, upload: Multer) => {
           .json({ success: true, data: result.rows[0], type: 'PUT' });
       } catch (error) {
         console.log(`Error editing data: ${error}`);
+        res
+          .status(500)
+          .json({ success: false, error: 'Internal Server Error' });
       }
     }
   );
