@@ -23,9 +23,9 @@ router
       const { rows } = await connection.query(query);
       connection.release();
       if (rows.length > 0) {
-        res.status(200).json(rows);
+        res.status(200).json({ rows, status: true });
       } else {
-        res.status(200).json([]);
+        res.status(200).json({ rows: [] });
       }
     } catch (err) {
       console.log(err);
@@ -45,9 +45,9 @@ router
       const { rows } = await connection.query(query);
       connection.release();
       if (rows.length > 0) {
-        res.status(200).json(rows);
+        res.status(200).json({ rows, status: true });
       } else {
-        res.status(200).json([]);
+        res.status(200).json({ rows: [] });
       }
     } catch (err) {
       console.log(err);
@@ -64,10 +64,10 @@ router
         `;
       await connection.query(deleteMember, [id]);
       connection.release();
-      res.status(200).send('Member deleted!');
+      res.status(200).json({ message: 'Member deleted', status: true });
     } catch (err) {
       console.log(err);
-      res.status(500).send('Failed to delete member');
+      res.status(500).json({ message: 'Failed delete', status: true });
     }
   })
   .patch('/approve', async (req: Request, res: Response) => {

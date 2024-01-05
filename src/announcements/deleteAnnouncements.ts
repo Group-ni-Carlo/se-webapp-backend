@@ -6,10 +6,13 @@ export const deleteAnnouncements = (app: IRouter, db: Pool) => {
     try {
       const { id } = req.params;
       await db.query('DELETE FROM announcements where id = $1', [id]);
-      res.status(200).send('Announcement deleted successfully.');
+      res
+        .status(200)
+        .send('Announcement deleted successfully.')
+        .json({ status: true });
     } catch (error) {
       console.error(error);
-      res.status(500).send('Server error.');
+      res.status(500).send('Server error.').json({ status: true });
     }
   });
 };

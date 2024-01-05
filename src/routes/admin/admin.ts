@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import express, { Request, Response } from 'express';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
@@ -8,11 +8,9 @@ const pool = new Pool({
   connectionString: `${process.env.DB_CONNECTION}`
 });
 
-export const authenticateUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const router = express.Router();
+
+router.get('/', async (req: Request, res: Response) => {
   const authHeader = req.header('Authorization');
   const token = authHeader?.split(' ')[1];
 
@@ -30,9 +28,13 @@ export const authenticateUser = async (
            `;
       const { rows } = await connection.query(checkUser, [user]);
       connection.release();
-      if (rows.length > 0 && rows[0].approval === 'APPROVED') {
-        console.log('you are user!');
-        next();
+      if (
+        rows.length > 0 &&
+        rows[0].approval === 'APPROVED' &&
+        rows[0].type === 'admin'
+      ) {
+        console.log('you are admin bro');
+        res.status(200).json({ status: true });
       } else {
         res.status(401).json({ status: false });
       }
@@ -41,4 +43,6 @@ export const authenticateUser = async (
       res.status(400).json({ err });
     }
   }
-};
+});
+
+export default router;
