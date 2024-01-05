@@ -33,7 +33,10 @@ export const getAnnouncements = (app: IRouter, db: Pool) => {
     const result = await db.query(query, [id]);
 
     if (result.rows.length === 0) {
-      res.status(404).send({ message: 'Announcement not found' });
+      res
+        .status(404)
+        .send({ message: 'Announcement not found' })
+        .json({ status: true });
       return;
     }
 

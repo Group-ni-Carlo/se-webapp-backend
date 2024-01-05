@@ -8,7 +8,7 @@ const pool = new Pool({
   connectionString: `${process.env.DB_CONNECTION}`
 });
 
-export const authenticateUser = async (
+export const checkAdmin = async (
   req: Request,
   res: Response,
   next: NextFunction
@@ -30,8 +30,12 @@ export const authenticateUser = async (
            `;
       const { rows } = await connection.query(checkUser, [user]);
       connection.release();
-      if (rows.length > 0 && rows[0].approval === 'APPROVED') {
-        console.log('you are user!');
+      if (
+        rows.length > 0 &&
+        rows[0].approval === 'APPROVED' &&
+        rows[0].type === 'admin'
+      ) {
+        console.log('you are admin bro!!');
         next();
       } else {
         res.status(401).json({ status: false });

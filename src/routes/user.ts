@@ -29,7 +29,7 @@ router.get('/profile', async (req: Request, res: Response) => {
       const { rows } = await connection.query(getInfo, [user]);
       connection.release();
       if (rows.length > 0) {
-        res.status(200).json({ userInfo: rows[0] });
+        res.status(200).json({ userInfo: rows[0], status: true });
       } else {
         res.status(401).json({ status: false });
       }
