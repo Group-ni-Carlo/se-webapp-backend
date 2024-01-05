@@ -2,7 +2,7 @@ import { IRouter } from 'express';
 import { Pool } from 'pg';
 
 export const deletePartners = (app: IRouter, db: Pool) => {
-  app.delete('/admin/delete/partners/:id', async (req, res) => {
+  app.delete('/admin/:id', async (req, res) => {
     const { id } = req.params;
     try {
       await db.query('DELETE FROM partners where id = $1', [id]);

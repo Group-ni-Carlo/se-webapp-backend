@@ -29,13 +29,15 @@ const startServer = async () => {
     .use(bodyParser.urlencoded({ extended: true }))
     .use(express.static('uploads'))
     .use('/admin', admin)
-    .use('/admin/announcements', checkAdmin, editAnnouncements)
-    .use('/admin/members', checkAdmin, members)
+    .use('/admin', checkAdmin)
+    .use('/admin/announcements', editAnnouncements)
+    .use('/admin/members', members)
     .use('/', checkIfLoggedIn, auth)
-    .use('/announcements', authenticateUser, announcements)
-    .use('/user', authenticateUser, user)
-    .use('/partners', authenticateUser, partners)
-    .use('/admin/partners', checkAdmin, editPartners)
+    .use('/', authenticateUser)
+    .use('/announcements', announcements)
+    .use('/user', user)
+    .use('/partners', partners)
+    .use('/admin/partners', editPartners)
     .listen(5000, () => {
       console.log('Server started at https://localhost:5000');
     });

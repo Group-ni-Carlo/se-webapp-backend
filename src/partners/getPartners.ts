@@ -4,7 +4,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 
 export const getPartners = (app: IRouter, db: Pool) => {
-  app.get('/partners', async (req, res) => {
+  app.get('/', async (req, res) => {
     dotenv.config();
     const query =
       'SELECT id, title, logo_file, date_last_edit FROM partners ORDER BY date_last_edit DESC';
@@ -26,13 +26,13 @@ export const getPartners = (app: IRouter, db: Pool) => {
     res.json(partners);
   });
 
-  app.get('/partners/:id', async (req, res) => {
+  app.get('/:id', async (req, res) => {
     const { id } = req.params;
     const query = 'SELECT * FROM partners WHERE id = $1';
     const result = await db.query(query, [id]);
 
     if (result.rows.length === 0) {
-      res.status(404).send({ message: 'Partner not found' });
+      res.status(404).send({ message: 'Announcement not found' });
       return;
     }
 
