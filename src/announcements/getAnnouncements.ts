@@ -1,15 +1,17 @@
 import { IRouter } from 'express';
 import { Pool } from 'pg';
 import path from 'path';
+import dotenv from 'dotenv';
 
 export const getAnnouncements = (app: IRouter, db: Pool) => {
+  dotenv.config();
   app.get('/', async (req, res) => {
     const query =
       'SELECT id, title, caption, image_file, date_last_edit FROM announcements ORDER BY date_last_edit DESC';
     const result = await db.query(query);
 
     const announcements = result.rows.map((announcement) => {
-      const imagePath = `http://localhost:3001/${path.basename(
+      const imagePath = `${process.env.BACKEND_CONNECTION}/${path.basename(
         announcement.image_file
       )}`;
 
@@ -36,7 +38,7 @@ export const getAnnouncements = (app: IRouter, db: Pool) => {
     }
 
     const announcement = result.rows[0];
-    const imagePath = `http://localhost:3001/${path.basename(
+    const imagePath = `${process.env.BACKEND_CONNECTION}/${path.basename(
       announcement.image_file
     )}`;
 
