@@ -6,6 +6,8 @@ import members from './routes/members';
 import auth from './routes/auth';
 import announcements from './routes/announcements';
 import editAnnouncements from './routes/admin/editAnnouncements';
+import partners from './routes/partners';
+import editPartners from './routes/admin/editPartners';
 import user from './routes/user';
 
 const startServer = async () => {
@@ -26,6 +28,8 @@ const startServer = async () => {
     .use('/', auth)
     .use('/announcements', announcements)
     .use('/admin/announcements', editAnnouncements)
+    .use('/partners', partners)
+    .use('/admin/partners', editPartners)
     .use('/user', user)
     .listen(5000, () => {
       console.log('Server started at https://localhost:5000');
