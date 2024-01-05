@@ -2,7 +2,6 @@ import express, { Request, Response } from 'express';
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
 
 dotenv.config();
 const pool = new Pool({
@@ -11,7 +10,7 @@ const pool = new Pool({
 
 const router = express.Router();
 
-router.get('/me', async (req: Request, res: Response) => {
+router.get('/profile', async (req: Request, res: Response) => {
   const authHeader = req.header('Authorization');
   const token = authHeader?.split(' ')[1];
 
