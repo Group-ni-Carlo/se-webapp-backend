@@ -6,6 +6,8 @@ import members from './routes/admin/members';
 import auth from './routes/auth';
 import announcements from './routes/announcements';
 import editAnnouncements from './routes/admin/editAnnouncements';
+import partners from './routes/partners';
+import editPartners from './routes/admin/editPartners';
 import user from './routes/user';
 import admin from './routes/admin/admin';
 import { checkAdmin } from './middlewares/checkAdmin';
@@ -32,6 +34,8 @@ const startServer = async () => {
     .use('/', checkIfLoggedIn, auth)
     .use('/announcements', authenticateUser, announcements)
     .use('/user', authenticateUser, user)
+    .use('/partners', authenticateUser, partners)
+    .use('/admin/partners', checkAdmin, editPartners)
     .listen(5000, () => {
       console.log('Server started at https://localhost:5000');
     });
