@@ -1,9 +1,9 @@
-import { Express } from 'express';
+import { IRouter } from 'express';
 import { Pool } from 'pg';
 import path from 'path';
 import dotenv from 'dotenv';
 
-export const getPartners = (app: Express, db: Pool) => {
+export const getPartners = (app: IRouter, db: Pool) => {
   app.get('/partners', async (req, res) => {
     dotenv.config();
     const query =
