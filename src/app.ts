@@ -6,7 +6,7 @@ import members from './routes/members';
 import auth from './routes/auth';
 import announcements from './routes/announcements';
 import editAnnouncements from './routes/admin/editAnnouncements';
-import authenticateUser from './middlewares/authenticateUser';
+import user from './routes/user';
 
 const startServer = async () => {
   const app = express();
@@ -26,6 +26,7 @@ const startServer = async () => {
     .use('/', auth)
     .use('/announcements', announcements)
     .use('/admin/announcements', editAnnouncements)
+    .use('/user', user)
     .listen(5000, () => {
       console.log('Server started at https://localhost:5000');
     });
