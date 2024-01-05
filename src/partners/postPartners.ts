@@ -1,8 +1,8 @@
-import { Express, Request, Response, NextFunction } from 'express';
+import { IRouter, Request, Response, NextFunction } from 'express';
 import { Pool } from 'pg';
 import { Multer } from 'multer';
 
-export const postPartners = (app: Express, db: Pool, upload: Multer) => {
+export const postPartners = (app: IRouter, db: Pool, upload: Multer) => {
   app.post(
     '/admin/create/partners',
     upload.single('logo_file'),

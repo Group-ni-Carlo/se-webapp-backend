@@ -1,7 +1,7 @@
-import { Express } from 'express';
+import { IRouter } from 'express';
 import { Pool } from 'pg';
 
-export const deletePartners = (app: Express, db: Pool) => {
+export const deletePartners = (app: IRouter, db: Pool) => {
   app.delete('/admin/delete/partners/:id', async (req, res) => {
     const { id } = req.params;
     try {
