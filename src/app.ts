@@ -33,11 +33,10 @@ const startServer = async () => {
     .use('/admin/announcements', editAnnouncements)
     .use('/admin/members', members)
     .use('/', checkIfLoggedIn, auth)
-    .use('/', authenticateUser)
-    .use('/announcements', announcements)
-    .use('/user', user)
-    .use('/partners', partners)
-    .use('/admin/partners', editPartners)
+    .use('/announcements', authenticateUser, announcements)
+    .use('/user', authenticateUser, user)
+    .use('/partners', authenticateUser, partners)
+    .use('/admin/partners', authenticateUser, editPartners)
     .listen(5000, () => {
       console.log('Server started at https://localhost:5000');
     });
