@@ -21,7 +21,7 @@ export const postPartners = (app: IRouter, db: Pool, upload: Multer) => {
         const logoFilePath = logoFile.path;
 
         const result = await db.query(
-          'INSERT INTO partners (title, logo_file, date_created, date_last_edit) VALUES ($1, $2 NOW(), NOW())',
+          'INSERT INTO partners (title, logo_file, date_created, date_last_edit, admin_id) VALUES ($1, $2, NOW(), NOW(), $3)',
           [title, logoFilePath]
         );
 
