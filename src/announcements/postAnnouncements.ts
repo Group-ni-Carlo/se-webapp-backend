@@ -34,14 +34,10 @@ export const postAnnouncements = (app: IRouter, db: Pool, upload: Multer) => {
       );
 
       console.log('Route create hit!');
-      res
-        .status(201)
-        .json({ success: true, data: result.rows[0], status: true });
+      res.status(201).json({ success: true, data: result.rows[0] });
     } catch (error) {
       console.log(`Error inserting data into the database: ${error}`);
-      res
-        .status(500)
-        .json({ success: false, error: 'Internal Server Error', status: true });
+      res.status(500).json({ success: false, error: 'Internal Server Error' });
     }
   });
 };

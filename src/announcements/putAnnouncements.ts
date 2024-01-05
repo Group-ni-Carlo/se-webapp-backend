@@ -43,14 +43,11 @@ export const putAnnouncements = (app: IRouter, db: Pool, upload: Multer) => {
         }
       );
       console.log('Route edit hit!');
-      res
-        .status(200)
-        .json({
-          success: true,
-          data: result.rows[0],
-          type: 'PUT',
-          status: true
-        });
+      res.status(200).json({
+        success: true,
+        data: result.rows[0],
+        type: 'PUT'
+      });
     } catch (error) {
       console.log(`Error editing data in the database: ${error}`);
       res.status(500).json({ success: false, error: 'Internal Server Error' });
