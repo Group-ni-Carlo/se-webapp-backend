@@ -36,7 +36,7 @@ const startServer = async () => {
     .use('/admin/partners', editPartners)
     .use('/admin/members', members)
     .use('/admin/merch', editMerch)
-    .use('/', checkIfLoggedIn, auth)
+    .use('/', auth)
     .use('/announcements', authenticateUser, announcements)
     .use('/user', authenticateUser, user)
     .use('/partners', authenticateUser, partners)
