@@ -14,7 +14,7 @@ router
     try {
       const connection = await pool.connect();
       const query = /* sql */ `
-      SELECT u.id, u.first_name, u.last_name, ul.email, u.year_level, u.approval
+      SELECT u.id, u.first_name, u.last_name, ul.email, u.type, u.approval
       FROM public.users AS u
       JOIN UserLogins AS ul ON u.id = ul.user_id
       WHERE u.approval = 'APPROVED'
@@ -36,7 +36,7 @@ router
     try {
       const connection = await pool.connect();
       const query = /* sql */ `
-      SELECT u.id, u.first_name, u.last_name, ul.email, u.year_level, u.approval
+      SELECT u.id, u.first_name, u.last_name, ul.email, u.type, u.approval
       FROM public.users AS u
       JOIN UserLogins AS ul ON u.id = ul.user_id
       WHERE u.approval = 'PENDING'
