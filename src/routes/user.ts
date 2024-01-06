@@ -15,7 +15,7 @@ router.get('/profile', async (req: Request, res: Response) => {
   const token = authHeader?.split(' ')[1];
 
   if (!token) {
-    res.status(401).json({ status: false });
+    res.status(201).json({ status: false });
   } else {
     try {
       const connection = await pool.connect();
