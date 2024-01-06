@@ -13,7 +13,7 @@ export const checkIfLoggedIn = async (
   const token = authHeader?.split(' ')[1];
 
   if (!token) {
-    res.status(401).json({ status: false });
+    res.status(400).json({ status: false });
   } else {
     next();
   }
