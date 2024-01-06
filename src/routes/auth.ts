@@ -15,6 +15,12 @@ router
   .post('/register', async (req: Request, res: Response) => {
     try {
       const { email, password, firstName, lastName } = req.body;
+
+      if (!password) {
+        console.log('Password is null');
+        return;
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       const connection = await pool.connect();
       const insertUser = /* sql */ `
