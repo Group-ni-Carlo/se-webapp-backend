@@ -14,7 +14,6 @@ import editMerch from './routes/admin/editMerch';
 import merch from './routes/merch';
 import { checkAdmin } from './middlewares/checkAdmin';
 import { authenticateUser } from './middlewares/authenticateUser';
-import { checkIfLoggedIn } from './middlewares/checkIfLoggedIn';
 
 const startServer = async () => {
   const app = express();
@@ -36,7 +35,7 @@ const startServer = async () => {
     .use('/admin/partners', editPartners)
     .use('/admin/members', members)
     .use('/admin/merch', editMerch)
-    .use('/', checkIfLoggedIn, auth)
+    .use('/', auth)
     .use('/announcements', authenticateUser, announcements)
     .use('/user', authenticateUser, user)
     .use('/partners', authenticateUser, partners)
