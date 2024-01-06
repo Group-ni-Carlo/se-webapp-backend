@@ -18,7 +18,7 @@ import { authenticateUser } from './middlewares/authenticateUser';
 const startServer = async () => {
   const app = express();
   const corsOptions = {
-    origin: ['http://localhost:3000', 'https://se-webapp-frontend.vercel.app/'],
+    origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
     optionsSuccessStatus: 204
