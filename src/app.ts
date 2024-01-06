@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import bodyParser from 'body-parser';
 
 import members from './routes/admin/members';
@@ -16,8 +17,15 @@ import { authenticateUser } from './middlewares/authenticateUser';
 
 const startServer = async () => {
   const app = express();
+  const corsOptions = {
+    origin: 'https://se-webapp-frontend.vercel.app/login',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    optionsSuccessStatus: 204
+  };
 
   app
+    .use(cors(corsOptions))
     .use(bodyParser.json())
     .use(bodyParser.urlencoded({ extended: true }))
     .use(express.static('uploads'))
