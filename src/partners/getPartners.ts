@@ -15,6 +15,8 @@ export const getPartners = (app: IRouter, db: Pool) => {
         partner.logo_file
       )}`;
 
+      console.log(logoPath);
+
       return {
         id: partner.id,
         title: partner.title,
