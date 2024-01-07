@@ -1,8 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-
-import dotenv from 'dotenv';
-
-dotenv.config();
+import jwt from 'jsonwebtoken';
 
 export const checkIfLoggedIn = async (
   req: Request,
@@ -15,6 +12,12 @@ export const checkIfLoggedIn = async (
   if (!token) {
     res.status(400).json({ status: false });
   } else {
-    next();
+    try {
+      jwt.verify(token, `${process.env.CODE}`);
+      next();
+    } catch (err) {
+      console.log(err);
+      res.status(400).json({ status: false });
+    }
   }
 };
