@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
 import members from './routes/admin/members';
 import auth from './routes/auth';
@@ -14,7 +15,6 @@ import editMerch from './routes/admin/editMerch';
 import merch from './routes/merch';
 import { checkAdmin } from './middlewares/checkAdmin';
 import { authenticateUser } from './middlewares/authenticateUser';
-import { checkIfLoggedIn } from './middlewares/checkIfLoggedIn';
 
 const startServer = async () => {
   const app = express();
@@ -24,6 +24,8 @@ const startServer = async () => {
     credentials: true,
     optionsSuccessStatus: 204
   };
+
+  dotenv.config();
 
   app
     .use(cors(corsOptions))
@@ -37,7 +39,6 @@ const startServer = async () => {
     .use('/admin/members', members)
     .use('/admin/merch', editMerch)
     .use('/', auth)
-    .use(authenticateUser)
     .use('/announcements', authenticateUser, announcements)
     .use('/user', authenticateUser, user)
     .use('/partners', authenticateUser, partners)

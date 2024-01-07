@@ -1,11 +1,9 @@
 import { IRouter } from 'express';
 import { Pool } from 'pg';
 import path from 'path';
-import dotenv from 'dotenv';
 
 export const getPartners = (app: IRouter, db: Pool) => {
   app.get('/', async (req, res) => {
-    dotenv.config();
     const query =
       'SELECT id, title, logo_file, date_last_edit FROM partners ORDER BY date_last_edit DESC';
     const result = await db.query(query);

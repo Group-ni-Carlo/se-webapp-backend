@@ -1,12 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
-dotenv.config();
-const pool = new Pool({
-  connectionString: `${process.env.DB_CONNECTION}`
-});
+import { databaseConnection as pool } from '../utils/pool';
 
 export const authenticateUser = async (
   req: Request,
@@ -31,14 +26,13 @@ export const authenticateUser = async (
       const { rows } = await connection.query(checkUser, [user]);
       connection.release();
       if (rows.length > 0 && rows[0].approval === 'APPROVED') {
-        console.log('you are user!');
         next();
       } else {
         res.status(401).json({ status: false });
       }
     } catch (err) {
       console.log(err);
-      res.status(400).json({ err });
+      res.status(400).json({ status: false });
     }
   }
 };
