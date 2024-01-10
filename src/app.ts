@@ -12,6 +12,7 @@ import editPartners from './routes/admin/editPartners';
 import user from './routes/user';
 import admin from './routes/admin/admin';
 import editMerch from './routes/admin/editMerch';
+import statistics from './routes/admin/statistics';
 import merch from './routes/merch';
 import { checkAdmin } from './middlewares/checkAdmin';
 import { authenticateUser } from './middlewares/authenticateUser';
@@ -39,6 +40,7 @@ const startServer = async () => {
     .use('/admin/partners', editPartners)
     .use('/admin/members', members)
     .use('/admin/merch', editMerch)
+    .use('/admin/stats', statistics)
     .use('/', auth)
     .use(checkIfLoggedIn)
     .use('/announcements', authenticateUser, announcements)
