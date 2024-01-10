@@ -1,12 +1,7 @@
 import express, { Request, Response } from 'express';
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
-dotenv.config();
-const pool = new Pool({
-  connectionString: `${process.env.DB_CONNECTION}`
-});
+import { databaseConnection as pool } from '../../utils/pool';
 
 const router = express.Router();
 
@@ -33,7 +28,6 @@ router.get('/', async (req: Request, res: Response) => {
         rows[0].approval === 'APPROVED' &&
         rows[0].type === 'admin'
       ) {
-        console.log('you are admin bro');
         res.status(200).json({ status: true });
       } else {
         res.status(401).json({ status: false });

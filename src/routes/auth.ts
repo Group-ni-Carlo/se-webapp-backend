@@ -1,13 +1,8 @@
 import express, { Request, Response } from 'express';
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 
-dotenv.config();
-const pool = new Pool({
-  connectionString: `${process.env.DB_CONNECTION}`
-});
+import { databaseConnection as pool } from '../utils/pool';
 
 const router = express.Router();
 
@@ -74,7 +69,7 @@ router
               { user: rows[0].user_id },
               `${process.env.CODE}`,
               {
-                expiresIn: '1h'
+                expiresIn: '24h'
               }
             );
             res.status(200).json({ token, message: 'Login successful' });

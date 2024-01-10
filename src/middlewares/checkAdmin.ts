@@ -1,12 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 
-dotenv.config();
-const pool = new Pool({
-  connectionString: `${process.env.DB_CONNECTION}`
-});
+import { databaseConnection as pool } from '../utils/pool';
 
 export const checkAdmin = async (
   req: Request,
@@ -35,14 +30,13 @@ export const checkAdmin = async (
         rows[0].approval === 'APPROVED' &&
         rows[0].type === 'admin'
       ) {
-        console.log('you are admin bro!!');
         next();
       } else {
         res.status(401).json({ status: false });
       }
     } catch (err) {
       console.log(err);
-      res.status(400).json({ err });
+      res.status(400).json({ status: false });
     }
   }
 };

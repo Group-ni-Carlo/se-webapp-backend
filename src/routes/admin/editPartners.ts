@@ -1,18 +1,11 @@
 import express, { IRouter } from 'express';
-import { Pool } from 'pg';
-import dotenv from 'dotenv';
 import multer from 'multer';
 import path from 'path';
 
+import { databaseConnection as pool } from '../../utils/pool';
 import { postPartners } from '../../partners/postPartners';
 import { putPartners } from '../../partners/putPartners';
 import { deletePartners } from '../../partners/deletePartners';
-
-dotenv.config();
-
-const db = new Pool({
-  connectionString: `${process.env.DB_CONNECTION}`
-});
 
 const router: IRouter = express.Router();
 const storage = multer.diskStorage({
@@ -25,10 +18,10 @@ const upload = multer({ storage });
 
 router.use(express.static('uploads'));
 
-postPartners(router, db, upload);
+postPartners(router, pool, upload);
 
-putPartners(router, db, upload);
+putPartners(router, pool, upload);
 
-deletePartners(router, db);
+deletePartners(router, pool);
 
 export default router;

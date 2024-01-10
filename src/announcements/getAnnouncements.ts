@@ -1,10 +1,8 @@
 import { IRouter } from 'express';
 import { Pool } from 'pg';
 import path from 'path';
-import dotenv from 'dotenv';
 
 export const getAnnouncements = (app: IRouter, db: Pool) => {
-  dotenv.config();
   app.get('/', async (req, res) => {
     const query =
       'SELECT id, title, caption, image_file, date_last_edit FROM announcements ORDER BY date_last_edit DESC';

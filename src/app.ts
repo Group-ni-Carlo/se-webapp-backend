@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
 import members from './routes/admin/members';
 import auth from './routes/auth';
@@ -11,6 +12,7 @@ import editPartners from './routes/admin/editPartners';
 import user from './routes/user';
 import admin from './routes/admin/admin';
 import editMerch from './routes/admin/editMerch';
+import statistics from './routes/admin/statistics';
 import merch from './routes/merch';
 import { checkAdmin } from './middlewares/checkAdmin';
 import { authenticateUser } from './middlewares/authenticateUser';
@@ -25,6 +27,8 @@ const startServer = async () => {
     optionsSuccessStatus: 204
   };
 
+  dotenv.config();
+
   app
     .use(cors(corsOptions))
     .use(bodyParser.json())
@@ -36,10 +40,11 @@ const startServer = async () => {
     .use('/admin/partners', editPartners)
     .use('/admin/members', members)
     .use('/admin/merch', editMerch)
+    .use('/admin/stats', statistics)
     .use('/', auth)
-    .use(authenticateUser)
+    .use(checkIfLoggedIn)
     .use('/announcements', authenticateUser, announcements)
-    .use('/user', authenticateUser, user)
+    .use('/user', user)
     .use('/partners', authenticateUser, partners)
     .use('/merch', authenticateUser, merch)
 
